@@ -21,8 +21,11 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.eko.file.handler.selector.DestinationPathSelector;
 
+/*Class to perform the writing operation*/
 public class ExcelFileWriter
 {
+	/* A utility function to create a new Excel file from another Excel file based parameters full file 
+	   name and path */
 	public void createFile(String fileNameAndPath, ArrayList<Integer> extractionColumns) throws IOException
 	{
 		FileInputStream fileInputStream=new FileInputStream(fileNameAndPath);
@@ -30,7 +33,7 @@ public class ExcelFileWriter
 		XSSFWorkbook workbookWrite=new XSSFWorkbook();
 		Sheet inputSheet=workbookRead.getSheetAt(0);
 		XSSFSheet sheet=workbookWrite.createSheet();
-		Iterator<Row> readIterator=inputSheet.iterator();
+		Iterator<Row> readIterator=inputSheet.iterator(); //iterator to read the rows of Excel file
 		int rowNum=0;
 		while(readIterator.hasNext())
 		{
@@ -38,7 +41,7 @@ public class ExcelFileWriter
 			int writeColNum=0;
 			Row currReadRow=readIterator.next();
 			Row currWriteRow=sheet.createRow(rowNum++);
-			Iterator<Cell> readCellIterator=currReadRow.iterator();
+			Iterator<Cell> readCellIterator=currReadRow.iterator(); //Iterator to read the columns of the current row
 			while (readCellIterator.hasNext())
 			{
 				Cell currReadCell=(Cell) readCellIterator.next();
@@ -52,6 +55,7 @@ public class ExcelFileWriter
 						String stringInp=currReadCell.getStringCellValue();
 						String stringOut="";
 						
+						/* Regex to define the extraction pattern for transaction ID */
 						String regex = "([a-zA-Z0-9\\/-]*)(NEFT|RTGS|IMPS|UPI)(\\/|\\-*)([a-zA-Z0-9\\/|\\-]*)";
 						
 						if(Pattern.matches(regex,stringInp))
@@ -60,7 +64,7 @@ public class ExcelFileWriter
 							Matcher matcher = pattern.matcher(stringInp);
 							if(matcher.find())
 							{
-								stringOut=matcher.group(1)+matcher.group(4);
+								stringOut=matcher.group(1)+matcher.group(4); //Only group 1 and group 4 of the current pattern are allowed
 							}
 							currWriteCell.setCellValue(stringOut);
 						}
@@ -70,6 +74,8 @@ public class ExcelFileWriter
 					else
 					if(currReadCell.getCellTypeEnum()==CellType.NUMERIC)
 					{
+						
+						/* The following if-section reads the date and write the date as the specified format into the new file since date is stores as numeric in Excel file  */
 						if(DateUtil.isCellDateFormatted(currReadCell))
 						{
 							CellStyle cellStyle = workbookWrite.createCellStyle();
@@ -85,6 +91,8 @@ public class ExcelFileWriter
 				}
 			}
 		}
+		
+		/* Following section saves the file */
 		String destinationPathAndName=DestinationPathSelector.getDestinationPath();
 		String destFileExt=FilenameUtils.getExtension(destinationPathAndName);
 		if(destFileExt.equals(null)||destFileExt.equals(""))

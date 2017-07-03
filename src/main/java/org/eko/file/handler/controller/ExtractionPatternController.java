@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 
+/* Class to expand the pattern to extract column */
 public class ExtractionPatternController
 {
+	
+	/* A utility function to extract the columns from the user input pattern */
 	public static ArrayList<Integer> getExtractionColumns(String extractionPatternWithSpace)
 	{
 		String extractionPattern=extractionPatternWithSpace.replaceAll("\\s", "");
